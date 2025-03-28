@@ -480,7 +480,7 @@ router.put("/completed", userauth, async function (req, res) {
 });
 
 router.get("/testing",async(req,res)=>{
-  return res.status(200).json({msg:"testing api"});
+  return res.status(200).json({msg:"testing api url"});
 })
 
 module.exports = router;
