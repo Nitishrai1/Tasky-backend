@@ -1,4 +1,4 @@
-name: Build Succeeds on PR
+name: Build and Deploy on PR
 
 on:
   pull_request:
@@ -25,16 +25,13 @@ jobs:
 
       - name: Build the Project
         run: npm run build
-deploy:
-    name: Deploy to Render
-    needs: build  # Runs only if the build succeeds
-    runs-on: ubuntu-latest
 
-    if: github.event_name == 'push'
+  deploy:
+    name: Deploy to Render
+    needs: build  # Ensure 'deploy' runs only if 'build' succeeds
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'  # Ensure deploy runs only on push, not PR
 
     steps:
       - name: Trigger Render Deployment
-        run: |
-          curl -X POST "$RENDER_DEPLOY_HOOK"
-        env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
