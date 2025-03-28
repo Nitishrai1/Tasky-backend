@@ -6,8 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "build": "echo \"No build step required\""
-},
-
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -20,6 +19,7 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
     "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.9.0",
