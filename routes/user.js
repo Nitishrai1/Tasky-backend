@@ -78,7 +78,7 @@ router.post("/signup", async function (req, res) {
     console.log(err);
     res.status(500).json({ msg: "internal server error" });
   }
-});
+});  
 
 router.post("/signin",signInLimit, async (req, res) => {
   const { email, password } = req.body;
