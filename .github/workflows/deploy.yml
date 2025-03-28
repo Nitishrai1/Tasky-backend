@@ -1,0 +1,22 @@
+name: Deploy to render
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+
+jobs:
+  deploy:
+    name: Deploy to Render
+    needs: build  # Ensure 'deploy' runs only if 'build' succeeds
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'  # Ensure deploy runs only on push, not PR
+
+    steps:
+      - name: Trigger Render Deployment
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+
+
+    
