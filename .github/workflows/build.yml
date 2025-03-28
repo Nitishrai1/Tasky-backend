@@ -25,16 +25,16 @@ jobs:
 
       - name: Build the Project
         run: npm run build
-deploy:
-    name: Deploy to Render
-    needs: build  # Runs only if the build succeeds
-    runs-on: ubuntu-latest
+  deploy:
+      name: Deploy to Render
+      needs: build  # Runs only if the build succeeds
+      runs-on: ubuntu-latest
 
-    if: github.event_name == 'push'
+      if: github.event_name == 'push'
 
-    steps:
-      - name: Trigger Render Deployment
-        run: |
-          curl -X POST "$RENDER_DEPLOY_HOOK"
-        env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+      steps:
+        - name: Trigger Render Deployment
+          run: |
+            curl -X POST "$RENDER_DEPLOY_HOOK"
+          env:
+            RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
