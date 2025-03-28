@@ -41,7 +41,6 @@ router.post("/upload-projectFile", upload2.single("file"), async (req, res) => {
 
 
 
-
 router.post("/save-projectDetails", async (req, res) => {
   const { developerId, message, clientEmail, projectUrl } = req.body;
 
