@@ -5,6 +5,18 @@ const { User, Notification } = require("../db/");
 const userauth = require("../middlewire/userauthentication");
 const router = Router();
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const hashedPassword = async (plainpassword) => {
+    const saltround = 10;
+    const hashedpassword = await bcrypt.hash(plainpassword, saltround);
+    return hashedpassword;
+};
+
+const comparePass = async (plainpassword, hashedpassword) => {
+    const matched = await bcrypt.compare(plainpassword, hashedpassword);
+    return matched;
+};
+
 
 
 const {
@@ -41,7 +53,7 @@ const {
   sendResetPassword,
   sentChatLink,
 } = require("../middlewire/emailnotification");
-const { hashedPassword, comparePass } = require("../middlewire/hasingpasss");
+
 
 router.post("/signup", async function (req, res) {
   const { email, password } = req.body;
