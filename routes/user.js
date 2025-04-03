@@ -41,6 +41,7 @@ const {
   sendResetPassword,
   sentChatLink,
 } = require("../middlewire/emailnotification");
+const { hashedPassword, comparePass } = require("../middlewire/hasingpasss");
 
 router.post("/signup", async function (req, res) {
   const { email, password } = req.body;
@@ -64,10 +65,12 @@ router.post("/signup", async function (req, res) {
     if (response) {
       return res.status(400).json({ msg: "User already exist Bad request" });
     }
+
+    const hashedpassword= await hashedPassword(password);
     const newuser = await User.create({
       username: generatedUsername,
       email: uservalidated,
-      password: password,
+      password: hashedpassword,
       todos: [],
     });
 
@@ -90,12 +93,16 @@ router.post("/signin",signInLimit, async (req, res) => {
 
     // console.log("in the try block");
     console.log(`Ip address of the request is ${req.ip}`);
-    const user = await User.findOne({ email, password });
-    console.log(user);
-    if (!user) {
-      console.log("no data found");
-      return res.status(401).json({ msg: "Chala ja bhosdikae" });
+    const user = await User.findOne({ email });
+    if (!user) { 
+      return res.status(401).json({ msg: "Invalid email or password" });
     }
+
+    const isMatch = await comparePass(password, user.password); 
+    if (!isMatch) {
+      return res.status(401).json({ msg: "Invalid email or password" });
+    }
+
     const userId = user._id;
     console.log(userId);
     const token = jwt.sign({ userId }, jwtkey);
