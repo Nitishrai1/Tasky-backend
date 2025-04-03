@@ -1,6 +1,5 @@
 
-const bcrypt=require("bcrypt");
-
+const bcrypt = require("bcrypt");
 export const hashedPassword=async(plainpassword)=>{
     const saltround=10;
     const hashedpassword=await bcrypt.hash(plainpassword,saltround);
