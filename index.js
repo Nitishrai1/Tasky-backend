@@ -40,7 +40,7 @@ app.use(cors())
 // midle wire
 // the below rate limmiter is for all route set up to 100 req for every 15 min
 const limit=ratelimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 5 * 60 * 1000,
 	max: 100,
 	standardHeaders: 'draft-8', 
 	legacyHeaders: false,

@@ -517,10 +517,13 @@ router.get(`/allUsers`, async(req,res)=>{
       .limit(parseLimit)
 
     const filtereduser=users.map((e)=>({
+      userId:e._id,
       username:e.username,
       imageLink:e.imageLink,
-      email:e.email
+      email:e.email,
+
     }))
+    
 
     return res.status(200).json({
       msg:"user data fetch succesfull",
