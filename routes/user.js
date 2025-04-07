@@ -510,6 +510,7 @@ router.get(`/allUsers`, async(req,res)=>{
     if(!limit || !page){
       return res.status(404).json({msg:"user not found"});
     }
+    const totaluser=await User.countDocuments(); 
     const users=await User.find()
       .sort({_id:1})
       .skip((parsedPage-1)*parseLimit)
@@ -520,11 +521,13 @@ router.get(`/allUsers`, async(req,res)=>{
       imageLink:e.imageLink,
       email:e.email
     }))
+
     return res.status(200).json({
       msg:"user data fetch succesfull",
       page:parseLimit,
       limit:parsedPage,
-      userdata:filtereduser
+      userdata:filtereduser,
+      totaluser
     });
 
 
