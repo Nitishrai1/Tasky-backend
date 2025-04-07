@@ -513,16 +513,21 @@ router.get(`/allUsers`, async(req,res)=>{
       .skip((parsedPage-1)*parseLimit)
       .limit(parseLimit)
 
+    const filtereduser=users.map((e)=>({
+      username:e.username,
+      imageLink:e.imageLink,
+      email:e.email
+    }))
     return res.status(200).json({
       msg:"user data fetch succesfull",
       page:parseLimit,
       limit:parsedPage,
-      users
+      userdata:filtereduser
     });
 
 
   }catch(err){
-    return res.status(500).json({msg:"Internal server error"});
+    return res.status(500).json({msg:"Internal server error",err});
 
   }
 })
