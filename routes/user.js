@@ -500,11 +500,13 @@ router.put("/completed", userauth, async function (req, res) {
 
 
 router.get(`/allUsers`, async(req,res)=>{
-  const {limit=10,page=1}=req.params;
+  const {page,limit}=req.query;
+  console.log(`page ${page} limit ${limit}`)
 
   try{
     const parsedPage=parseInt(page);
     const parseLimit=parseInt(limit);
+    console.log(`parshedpage ${parsedPage} limit ${parseLimit}`)
     if(!limit || !page){
       return res.status(404).json({msg:"user not found"});
     }
