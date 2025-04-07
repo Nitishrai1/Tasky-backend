@@ -498,6 +498,35 @@ router.put("/completed", userauth, async function (req, res) {
   }
 });
 
+
+router.get(`/allUsers`, async(req,res)=>{
+  const {limit=10,page=1}=req.params;
+
+  try{
+    const parsedPage=parseInt(page);
+    const parseLimit=parseInt(limit);
+    if(!limit || !page){
+      return res.status(404).json({msg:"user not found"});
+    }
+    const users=await User.find()
+      .sort({_id:1})
+      .skip((parsedPage-1)*parseLimit)
+      .limit(parseLimit)
+
+    return res.status(200).json({
+      msg:"user data fetch succesfull",
+      page:parseLimit,
+      limit:parsedPage,
+      users
+    });
+
+
+  }catch(err){
+    return res.status(500).json({msg:"Internal server error"});
+
+  }
+})
+
 router.get("/testing",async(req,res)=>{
   return res.status(200).json({msg:"testing api url"});
 })
