@@ -537,6 +537,37 @@ router.get(`/allUsers`, async(req,res)=>{
   }
 })
 
+
+
+router.get("/topUsers",async(req,res)=>{
+  const {limit=5}=req.query;
+
+  try{
+    console.log("inside the top user func");
+
+    const alluser=await User.find();
+    
+
+    const filteredTopuser=alluser.filter((user)=>user.todos.length > 5)
+    .slice(0,5);
+    console.log("top user are");
+    
+    const topUsers=filteredTopuser.map((user)=>({
+      userName:user.username,
+      email:user.email
+    }))
+
+
+    return res.status(200).json({msg:"top user fetched successfull",topUsers})
+
+    
+
+  }catch(err){
+    return res.status(500).json({msg:"Internal server error",err});
+
+  }
+})
+
 router.get("/testing",async(req,res)=>{
   return res.status(200).json({msg:"testing api url"});
 })
