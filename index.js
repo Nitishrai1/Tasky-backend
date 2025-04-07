@@ -49,7 +49,7 @@ const limit=ratelimit({
 
 
 
-app.use(limit)
+// app.use(limit)
 app.use(express.json());
 app.use("/user",userroute);
 app.use("/user/Search",dataroute)
