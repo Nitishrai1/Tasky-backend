@@ -1,26 +1,21 @@
-
 services:
   mongodb:
-    image: mongo:latest
+    image: "mongo:latest"
     container_name: mongo_db
     ports:
-      - "27017:27017"
+      - 27017:27017
     volumes:
       - mongodb_data:/data/db
 
-  backend:
-    build: .
-    container_name: backend_app
+  tasky_backend:
+    image: nitishrai7070/tasky-backend
+    container_name: backend_application
     depends_on:
       - mongodb
     ports:
-      - "3000:3000"
+      - 3000:3000
     environment:
-      - MONGO_URL=mongodb://mongodb:27017/taskydb
-    volumes:
-      - .:/app
-    working_dir: /app
-    command: ["npm", "start"]
+      - MONGODB_URL=mongodb://mongo_db:27017/taskydb
 
 volumes:
   mongodb_data:

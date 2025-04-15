@@ -28,9 +28,9 @@ jobs:
 
   deploy:
     name: Deploy to Render
-    needs: build  # Ensure 'deploy' runs only if 'build' succeeds
+    needs: build  
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'  # Ensure deploy runs only on push, not PR
+    if: github.event_name == 'push'  
 
     steps:
       - name: Trigger Render Deployment

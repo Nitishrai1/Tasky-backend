@@ -1,8 +1,5 @@
 const express=require("express");
 const app=express();
-// import { express } from "express";
-// sabse pahle ham yek chat pp ka bhi connection bana lete hai
-
 const userroute=require("./routes/user")
 const ratelimit=require("express-rate-limit");
 const dataroute=require("./routes/Data")
@@ -49,7 +46,7 @@ const limit=ratelimit({
 
 
 
-// app.use(limit)
+app.use(limit)
 app.use(express.json());
 app.use("/user",userroute);
 app.use("/user/Search",dataroute)
@@ -59,6 +56,3 @@ const PORT=3000;
 app.listen(PORT,function(){
     console.log(`App is listing on port number ${PORT}`);
 })
-// server.listen(3001, () => {
-//     console.log('Backend server is running on port 3001');
-// });

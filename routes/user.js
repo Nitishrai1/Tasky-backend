@@ -6,6 +6,8 @@ const userauth = require("../middlewire/userauthentication");
 const router = Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+
+
 const hashedPassword = async (plainpassword) => {
     const saltround = 10;
     const hashedpassword = await bcrypt.hash(plainpassword, saltround);
@@ -552,7 +554,7 @@ router.get("/topUsers",async(req,res)=>{
     
 
     const filteredTopuser=alluser.filter((user)=>user.todos.length > 5)
-    .slice(0,5);
+    
     console.log("top user are");
     
     const topUsers=filteredTopuser.map((user)=>({
