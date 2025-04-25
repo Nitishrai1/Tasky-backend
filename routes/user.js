@@ -5,6 +5,20 @@ const { User, Notification } = require("../db/");
 const userauth = require("../middlewire/userauthentication");
 const router = Router();
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
+
+const hashedPassword = async (plainpassword) => {
+    const saltround = 10;
+    const hashedpassword = await bcrypt.hash(plainpassword, saltround);
+    return hashedpassword;
+};
+
+const comparePass = async (plainpassword, hashedpassword) => {
+    const matched = await bcrypt.compare(plainpassword, hashedpassword);
+    return matched;
+};
+
 
 
 const {
@@ -42,6 +56,7 @@ const {
   sentChatLink,
 } = require("../middlewire/emailnotification");
 
+
 router.post("/signup", async function (req, res) {
   const { email, password } = req.body;
 
@@ -64,10 +79,12 @@ router.post("/signup", async function (req, res) {
     if (response) {
       return res.status(400).json({ msg: "User already exist Bad request" });
     }
+
+    const hashedpassword= await hashedPassword(password);
     const newuser = await User.create({
       username: generatedUsername,
       email: uservalidated,
-      password: password,
+      password: hashedpassword,
       todos: [],
     });
 
@@ -90,12 +107,16 @@ router.post("/signin",signInLimit, async (req, res) => {
 
     // console.log("in the try block");
     console.log(`Ip address of the request is ${req.ip}`);
-    const user = await User.findOne({ email, password });
-    console.log(user);
-    if (!user) {
-      console.log("no data found");
-      return res.status(401).json({ msg: "Chala ja bhosdikae" });
+    const user = await User.findOne({ email });
+    if (!user) { 
+      return res.status(401).json({ msg: "Invalid email or password" });
     }
+
+    const isMatch = await comparePass(password, user.password); 
+    if (!isMatch) {
+      return res.status(401).json({ msg: "Invalid email or password" });
+    }
+
     const userId = user._id;
     console.log(userId);
     const token = jwt.sign({ userId }, jwtkey);
@@ -479,8 +500,83 @@ router.put("/completed", userauth, async function (req, res) {
   }
 });
 
-router.get("/testing",async(req,res)=>{
-  return res.status(200).json({msg:"testing api"});
+
+router.get(`/allUsers`, async(req,res)=>{
+  const {page,limit}=req.query;
+  console.log(`page ${page} limit ${limit}`)
+
+  try{
+    const parsedPage=parseInt(page);
+    const parseLimit=parseInt(limit);
+    console.log(`parshedpage ${parsedPage} limit ${parseLimit}`)
+    if(!limit || !page){
+      return res.status(404).json({msg:"user not found"});
+    }
+    const totaluser=await User.countDocuments(); 
+    const users=await User.find()
+      .sort({_id:1})
+      .skip((parsedPage-1)*parseLimit)
+      .limit(parseLimit)
+
+    const filtereduser=users.map((e)=>({
+      userId:e._id,
+      username:e.username,
+      imageLink:e.imageLink,
+      email:e.email,
+
+    }))
+    
+
+    return res.status(200).json({
+      msg:"user data fetch succesfull",
+      page:parseLimit,
+      limit:parsedPage,
+      userdata:filtereduser,
+      totaluser
+    });
+
+
+  }catch(err){
+    return res.status(500).json({msg:"Internal server error",err});
+
+  }
 })
+
+
+
+router.get("/topUsers",async(req,res)=>{
+  const {limit=5}=req.query;
+
+  try{
+    console.log("inside the top user func");
+
+    const alluser=await User.find();
+    
+
+    const filteredTopuser=alluser.filter((user)=>user.todos.length > 5)
+    
+    console.log("top user are");
+    
+    const topUsers=filteredTopuser.map((user)=>({
+      userName:user.username,
+      email:user.email
+    }))
+
+
+    return res.status(200).json({msg:"top user fetched successfull",topUsers})
+
+    
+
+  }catch(err){
+    return res.status(500).json({msg:"Internal server error",err});
+
+  }
+})
+
+router.get("/testing",async(req,res)=>{
+  return res.status(200).json({msg:"testing api url"});
+})
+
+
 
 module.exports = router;

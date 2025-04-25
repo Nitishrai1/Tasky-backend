@@ -16,6 +16,7 @@ const projectDetails = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'project-details',
+    resource_type: 'raw', 
     allowed_formats: ['doc', 'docx', 'pdf'],
   },
 });
