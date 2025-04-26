@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasky-service
+spec:
+  selector:
+    app: tasky-backend
+  ports:
+    - protocol: TCP
+      port: 3000 ##the port on which i will hit in the url
+      targetPort: 3000  #the port it will redirect to
+      # nodePort: 30008
+  type: ClusterIP # you can change this to load balancer cluster IP is for inter nodes conenction
