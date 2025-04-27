@@ -1,15 +1,15 @@
 const { Router } = require("express");
-const { User,Notification } = require("../db");
+const { User, Notification } = require("../db");
 const userauth = require("../middlewire/userauthentication");
 const router = Router();
 
-const { upload,upload2} = require("../utils/multter"); // Path to your multer config file
+const { upload, upload2 } = require("../utils/multter"); // Path to your multer config file
 
 router.post("/upload-profile-picture", upload.single("image"), (req, res) => {
   try {
     // console.log(`inside the upload api`)
-    if(!req.file){
-      return res.status(404).json({msg:"Please upload the image"})
+    if (!req.file) {
+      return res.status(404).json({ msg: "Please upload the image" });
     }
     const imageUrl = req.file.path; // This will be the URL of the uploaded image from Cloudinary
     // console.log(`the image url in api is ${imageUrl}`)
@@ -38,8 +38,6 @@ router.post("/upload-projectFile", upload2.single("file"), async (req, res) => {
     });
   }
 });
-
-
 
 router.post("/save-projectDetails", async (req, res) => {
   const { developerId, message, clientEmail, projectUrl } = req.body;
@@ -70,37 +68,25 @@ router.post("/save-projectDetails", async (req, res) => {
   }
 });
 
-
-
-
-
-
-router.get('/allUser',async(req,res)=>{
-  try{
-    const user=await User.find();
-    const totaluser=[];
-    user.map((data)=>{
-      const userdata={
-        userId:data._id,
-        userName:data.username,
-        userEmail:data.email,
-        imageLink:data.imageLink,
-      }
+router.get("/allUser", async (req, res) => {
+  try {
+    const user = await User.find();
+    const totaluser = [];
+    user.map((data) => {
+      const userdata = {
+        userId: data._id,
+        userName: data.username,
+        userEmail: data.email,
+        imageLink: data.imageLink,
+      };
       totaluser.push(userdata);
-    })
-    res.status(200).json({totaluser});
-
-  }catch(err){
-    console.log(`Err orccured in fettching all the developer`)
+    });
+    res.status(200).json({ totaluser });
+  } catch (err) {
+    console.log(`Err orccured in fettching all the developer`);
     res.status(500).json("Internal server Error");
   }
-
-})
-
-
-
-
-
+});
 
 router.get("/:title", userauth, async (req, res) => {
   const id = req.userId;
@@ -144,32 +130,33 @@ router.get("/notification/:developerId", async (req, res) => {
   }
 });
 
-router.post("/updateNotification",userauth,async (req,res)=>{
-  const id=req.userId;
+router.post("/updateNotification", userauth, async (req, res) => {
+  const id = req.userId;
   // console.log(`user is in the route is ${id}`)
-  try{
-    const notificaiton =await Notification.find({
-      developerId:id
-    })
+  try {
+    const notificaiton = await Notification.find({
+      developerId: id,
+    });
     // console.log(`all notificaiotn are ${notificaiton}`)
 
-    if(!notificaiton || notificaiton.length===0){
-      return res.status(404).json({msg:'Notificaiotn not found for the user'});
+    if (!notificaiton || notificaiton.length === 0) {
+      return res
+        .status(404)
+        .json({ msg: "Notificaiotn not found for the user" });
     }
     // ab pura notificaiton par iterate karke read ko true kar do
     // console.log("before update");
     for (let noti of notificaiton) {
       noti.read = true;
-      await noti.save();  
+      await noti.save();
     }
     // console.log('after update');
-    return res.status(200).json({msg:"All notification have been marked as read"});
-
-  }catch(err){
-    return res.status(500).json({msg:"Internal server error"});
-
+    return res
+      .status(200)
+      .json({ msg: "All notification have been marked as read" });
+  } catch (err) {
+    return res.status(500).json({ msg: "Internal server error" });
   }
-})
-
+});
 
 module.exports = router;

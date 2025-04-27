@@ -1,25 +1,22 @@
 require("dotenv").config();
 const { Router } = require("express");
-const ratelimit=require("express-rate-limit");
+const ratelimit = require("express-rate-limit");
 const { User, Notification } = require("../db/");
 const userauth = require("../middlewire/userauthentication");
 const router = Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-
 const hashedPassword = async (plainpassword) => {
-    const saltround = 10;
-    const hashedpassword = await bcrypt.hash(plainpassword, saltround);
-    return hashedpassword;
+  const saltround = 10;
+  const hashedpassword = await bcrypt.hash(plainpassword, saltround);
+  return hashedpassword;
 };
 
 const comparePass = async (plainpassword, hashedpassword) => {
-    const matched = await bcrypt.compare(plainpassword, hashedpassword);
-    return matched;
+  const matched = await bcrypt.compare(plainpassword, hashedpassword);
+  return matched;
 };
-
-
 
 const {
   createTodo,
@@ -28,20 +25,19 @@ const {
   usernamevalidated,
 } = require("../utils");
 
-const signInLimit=ratelimit({
-  windowMs: 5*50*1000, //5 min
-  max:5,
-  standardHeaders: 'draft-8',
+const signInLimit = ratelimit({
+  windowMs: 5 * 50 * 1000, //5 min
+  max: 5,
+  standardHeaders: "draft-8",
   legacyHeaders: false,
-})
+});
 
-const paswrodResetLimit=ratelimit({
-  windowMs: 5*50*1000, //5 min
-  max:5,
-  standardHeaders: 'draft-8',
+const paswrodResetLimit = ratelimit({
+  windowMs: 5 * 50 * 1000, //5 min
+  max: 5,
+  standardHeaders: "draft-8",
   legacyHeaders: false,
-
-})
+});
 
 const jwtkey = "fuckoffhacker";
 const {
@@ -55,7 +51,6 @@ const {
   sendResetPassword,
   sentChatLink,
 } = require("../middlewire/emailnotification");
-
 
 router.post("/signup", async function (req, res) {
   const { email, password } = req.body;
@@ -80,7 +75,7 @@ router.post("/signup", async function (req, res) {
       return res.status(400).json({ msg: "User already exist Bad request" });
     }
 
-    const hashedpassword= await hashedPassword(password);
+    const hashedpassword = await hashedPassword(password);
     const newuser = await User.create({
       username: generatedUsername,
       email: uservalidated,
@@ -97,22 +92,20 @@ router.post("/signup", async function (req, res) {
     console.log(err);
     res.status(500).json({ msg: "internal server error" });
   }
-});  
+});
 
-router.post("/signin",signInLimit, async (req, res) => {
+router.post("/signin", signInLimit, async (req, res) => {
   const { email, password } = req.body;
 
-
   try {
-
     // console.log("in the try block");
     console.log(`Ip address of the request is ${req.ip}`);
     const user = await User.findOne({ email });
-    if (!user) { 
+    if (!user) {
       return res.status(401).json({ msg: "Invalid email or password" });
     }
 
-    const isMatch = await comparePass(password, user.password); 
+    const isMatch = await comparePass(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ msg: "Invalid email or password" });
     }
@@ -180,12 +173,10 @@ router.post("/reset-password", async (req, res) => {
     res.status(200).json({ message: "Password has been reset successfully" });
   } catch (err) {
     // console.log("Error in the reset token route",err);
-    return res
-      .status(500)
-      .json({
-        message:
-          "Internal server error in the reset link of the token validation",
-      });
+    return res.status(500).json({
+      message:
+        "Internal server error in the reset link of the token validation",
+    });
   }
 });
 
@@ -218,10 +209,9 @@ router.get("/unreadNotification", userauth, async (req, res) => {
 
 router.get("/allNotification", userauth, async (req, res) => {
   const id = req.userId;
-  console.log(`Ip address of the the request is ${req.ip}`)
+  console.log(`Ip address of the the request is ${req.ip}`);
 
   try {
-
     const user = await Notification.find({
       developerId: id,
     });
@@ -230,8 +220,7 @@ router.get("/allNotification", userauth, async (req, res) => {
       return res.status(404).json({ msg: "No new notifications" });
     }
 
-    const allNotification = user
-      .filter((usr) => usr.read === false);
+    const allNotification = user.filter((usr) => usr.read === false);
 
     return res.status(200).json({ allNotification });
   } catch (err) {
@@ -244,7 +233,7 @@ router.get("/todos", userauth, async function (req, res) {
   const id = req.userId;
 
   console.log(`the user id in the get route is ${id}`);
-  console.log(`Ip address of the the request is ${req.ip}`)
+  console.log(`Ip address of the the request is ${req.ip}`);
 
   try {
     const user = await User.findById({ _id: id });
@@ -330,26 +319,31 @@ router.post("/updatePhoto", userauth, async (req, res) => {
   }
 });
 
-router.post("/changepassword",paswrodResetLimit, userauth, async (req, res) => {
-  const { newpassword } = req.body;
+router.post(
+  "/changepassword",
+  paswrodResetLimit,
+  userauth,
+  async (req, res) => {
+    const { newpassword } = req.body;
 
-  const id = req.userId;
-  try {
-    // console.log(`newpassword ${newpassword}`)
-    const user = await User.findOne({
-      _id: id,
-    });
-    if (!user) {
-      return res.status(404).json({ msg: "User does not exits" });
+    const id = req.userId;
+    try {
+      // console.log(`newpassword ${newpassword}`)
+      const user = await User.findOne({
+        _id: id,
+      });
+      if (!user) {
+        return res.status(404).json({ msg: "User does not exits" });
+      }
+
+      user.password = newpassword;
+      await user.save();
+      return res.status(200).json({ msg: "Password changed succesfully" });
+    } catch (err) {
+      return res.status(500).json({ msg: "Internal server error" });
     }
-
-    user.password = newpassword;
-    await user.save();
-    return res.status(200).json({ msg: "Password changed succesfully" });
-  } catch (err) {
-    return res.status(500).json({ msg: "Internal server error" });
   }
-});
+);
 
 router.post("/changename", userauth, async (req, res) => {
   const id = req.userId;
@@ -500,86 +494,69 @@ router.put("/completed", userauth, async function (req, res) {
   }
 });
 
+router.get(`/allUsers`, async (req, res) => {
+  const { page, limit } = req.query;
+  console.log(`page ${page} limit ${limit}`);
 
-router.get(`/allUsers`, async(req,res)=>{
-  const {page,limit}=req.query;
-  console.log(`page ${page} limit ${limit}`)
-
-  try{
-    const parsedPage=parseInt(page);
-    const parseLimit=parseInt(limit);
-    console.log(`parshedpage ${parsedPage} limit ${parseLimit}`)
-    if(!limit || !page){
-      return res.status(404).json({msg:"user not found"});
+  try {
+    const parsedPage = parseInt(page);
+    const parseLimit = parseInt(limit);
+    console.log(`parshedpage ${parsedPage} limit ${parseLimit}`);
+    if (!limit || !page) {
+      return res.status(404).json({ msg: "user not found" });
     }
-    const totaluser=await User.countDocuments(); 
-    const users=await User.find()
-      .sort({_id:1})
-      .skip((parsedPage-1)*parseLimit)
-      .limit(parseLimit)
+    const totaluser = await User.countDocuments();
+    const users = await User.find()
+      .sort({ _id: 1 })
+      .skip((parsedPage - 1) * parseLimit)
+      .limit(parseLimit);
 
-    const filtereduser=users.map((e)=>({
-      userId:e._id,
-      username:e.username,
-      imageLink:e.imageLink,
-      email:e.email,
-
-    }))
-    
+    const filtereduser = users.map((e) => ({
+      userId: e._id,
+      username: e.username,
+      imageLink: e.imageLink,
+      email: e.email,
+    }));
 
     return res.status(200).json({
-      msg:"user data fetch succesfull",
-      page:parseLimit,
-      limit:parsedPage,
-      userdata:filtereduser,
-      totaluser
+      msg: "user data fetch succesfull",
+      page: parseLimit,
+      limit: parsedPage,
+      userdata: filtereduser,
+      totaluser,
     });
-
-
-  }catch(err){
-    return res.status(500).json({msg:"Internal server error",err});
-
+  } catch (err) {
+    return res.status(500).json({ msg: "Internal server error", err });
   }
-})
+});
 
+router.get("/topUsers", async (req, res) => {
+  const { limit = 5 } = req.query;
 
-
-router.get("/topUsers",async(req,res)=>{
-  const {limit=5}=req.query;
-
-  try{
+  try {
     console.log("inside the top user func");
 
-    const alluser=await User.find();
-    
+    const alluser = await User.find();
 
-    const filteredTopuser=alluser.filter((user)=>user.todos.length > 5)
-    
+    const filteredTopuser = alluser.filter((user) => user.todos.length > 5);
+
     console.log("top user are");
-    
-    const topUsers=filteredTopuser.map((user)=>({
-      userName:user.username,
-      email:user.email
-    }))
 
+    const topUsers = filteredTopuser.map((user) => ({
+      userName: user.username,
+      email: user.email,
+    }));
 
-    return res.status(200).json({msg:"top user fetched successfull",topUsers})
-
-    
-
-  }catch(err){
-    return res.status(500).json({msg:"Internal server error",err});
-
+    return res
+      .status(200)
+      .json({ msg: "top user fetched successfull", topUsers });
+  } catch (err) {
+    return res.status(500).json({ msg: "Internal server error", err });
   }
-})
+});
 
-router.get("/testing",async(req,res)=>{
-  return res.status(200).json({msg:"testing api url"});
-})
-
-
+router.get("/testing", async (req, res) => {
+  return res.status(200).json({ msg: "testing api url" });
+});
 
 module.exports = router;
-
-
-
