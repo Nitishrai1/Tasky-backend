@@ -165,7 +165,9 @@ router.post("/reset-password", async (req, res) => {
       return res.status(404).json({ message: "User does not exist" });
     }
 
-    user.password = password;
+    const newpassword=await hashedPassword(password);
+
+    user.password = newpassword;
     user.resetPasswordExpires = undefined;
     user.resetPasswordToken = undefined;
     await user.save();
