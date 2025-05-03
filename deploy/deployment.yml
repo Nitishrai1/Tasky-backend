@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasky-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: tasky-backend
+  template:
+    metadata:
+      labels:
+        app: tasky-backend
+    spec:
+      containers:
+        - name: tasky-container
+          image: nitishrai7070/tasky-backend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URL
+              value: "mongodb+srv://nitishraigkp007:z6InbXvBf7QluDgq@tasky-database.nq1km.mongodb.net/Tasky"
