@@ -4,7 +4,7 @@ const cloudinary = require('../middlewire/Cloudinery');
 
 
 const storage = new CloudinaryStorage({
-  
+
   cloudinary: cloudinary,
   params: {
     folder: 'user-profile-pictures', // Folder name in Cloudinary
@@ -16,7 +16,7 @@ const projectDetails = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'project-details',
-    resource_type: 'raw', 
+    resource_type: 'raw',
     allowed_formats: ['doc', 'docx', 'pdf'],
   },
 });
@@ -27,4 +27,4 @@ const upload2 = multer({
 });
 
 
-module.exports = {upload,upload2};
+module.exports = { upload, upload2 };
