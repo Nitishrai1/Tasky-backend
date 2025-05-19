@@ -567,8 +567,14 @@ router.get("/getuser", async (req, res) => {
     if (!user) {
       return res.status(402).json({ msg: "user not found" });
     }
+    const data={
+      username:user.username,
+      email:user.email,
+      imageLink:user.email
 
-    return res.status(200).json({ msg: "user found", user: user });
+    }
+
+    return res.status(200).json({ msg: "user found", user: data });
 
   } catch (err) {
     return res.status(500).json({msg:"internal server error"});
