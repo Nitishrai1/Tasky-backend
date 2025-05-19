@@ -558,29 +558,37 @@ router.get("/topUsers", async (req, res) => {
 });
 
 router.get("/getuser", async (req, res) => {
-  const useremail = req.query.userEmail;
+  const userEmail = req.query.userEmail;
+
+  
+  if (!userEmail) {
+    return res.status(400).json({ msg: "Email is required in query parameters" });
+  }
 
   try {
-    const user = await User.find({
-      email: useremail
-    })
+    const user = await User.findOne({ email: userEmail });
+
     if (!user) {
-      return res.status(402).json({ msg: "user not found" });
+      return res.status(404).json({ msg: "User not found" });
     }
-    const data={
-      username:user.username,
-      email:user.email,
-      imageLink:user.email
+    
 
-    }
+    const data = {
+      username: user.username,
+      email: user.email,
+      imageLink: user.imageLink
+    };
 
-    return res.status(200).json({ msg: "user found", user: data });
+    console.log(data);
+
+    return res.status(200).json({ msg: "User found", user: data });
 
   } catch (err) {
-    return res.status(500).json({msg:"internal server error"});
-
+    console.error("Error fetching user:", err);
+    return res.status(500).json({ msg: "Internal server error" });
   }
-})
+});
+
 router.get("/testing", async (req, res) => {
   return res.status(200).json({ msg: "testing api url" });
 });
