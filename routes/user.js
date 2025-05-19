@@ -6,6 +6,7 @@ const userauth = require("../middlewire/userauthentication");
 const router = Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const jwtkey = process.env.JWT_KEY;
 
 const hashedPassword = async (plainpassword) => {
   const saltround = 10;
@@ -39,7 +40,6 @@ const paswrodResetLimit = ratelimit({
   legacyHeaders: false,
 });
 
-const jwtkey = process.env.jwt_key;
 const {
   sendSignupEmail,
   sendLoggedInNotification,
