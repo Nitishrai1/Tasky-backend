@@ -1,9 +1,8 @@
-
-require('dotenv').config()
+require('dotenv').config();
 const mongoose = require("mongoose");
-console.log(`mongo url is ${process.env.MONGODB_URL}`)
-mongoose.connect(process.env.MONGODB_URL)
 
+
+mongoose.connect(process.env.MONGODB_URL)
     .then(() => console.log('Connected to MongoDB'))
     .catch((error) => console.error('MongoDB connection error:', error));
 
@@ -13,38 +12,18 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     todos: [
         {
-            title: {
-                type: String,
-                default: "Anonymus"
-            },
-            description: {
-                type: String,
-                default: "Anonymus"
-            },
-            status: {
-                type: String,
-                enum: ['started', 'ongoing', 'completed'],
-                default: 'started'
-            },
-            completed: {
-                type: Boolean,
-                default: false,
-            },
+            title: { type: String, default: "Anonymus" },
+            description: { type: String, default: "Anonymus" },
+            status: { type: String, enum: ['started', 'ongoing', 'completed'], default: 'started' },
+            completed: { type: Boolean, default: false },
             startDate: Date,
-
             endDate: Date,
-
-            lastUpdatedDate: {
-                type: Date,
-                default: Date.now,
-            },
-
+            lastUpdatedDate: { type: Date, default: Date.now },
         }
     ],
     resetPasswordToken: String,
     resetPasswordExpires: Date,
     imageLink: String,
-
 });
 
 const notification = new mongoose.Schema({
@@ -54,17 +33,16 @@ const notification = new mongoose.Schema({
     projectDetails: { type: String, required: true },
     read: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
-
-})
-const Notification = mongoose.model('Notification', notification);
+});
 
 const Addressschema = new mongoose.Schema({
     college: String,
     address: String,
     phoneNumber: Number,
     secondryEmail: String,
+});
 
-})
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
+const Notification = mongoose.models.Notification || mongoose.model('Notification', notification);
 
 module.exports = { User, Notification };

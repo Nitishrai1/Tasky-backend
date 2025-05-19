@@ -26,20 +26,20 @@ const {
 } = require("../utils");
 
 const signInLimit = ratelimit({
-  windowMs: 5 * 50 * 1000, //5 min
+  windowMs: 5 * 50 * 1000,
   max: 5,
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
 
 const paswrodResetLimit = ratelimit({
-  windowMs: 5 * 50 * 1000, //5 min
+  windowMs: 5 * 50 * 1000,
   max: 5,
   standardHeaders: "draft-8",
   legacyHeaders: false,
 });
 
-const jwtkey = "fuckoffhacker";
+const jwtkey = process.env.jwt_key;
 const {
   sendSignupEmail,
   sendLoggedInNotification,
@@ -557,8 +557,26 @@ router.get("/topUsers", async (req, res) => {
   }
 });
 
+router.get("/getuser", async (req, res) => {
+  const useremail = req.query.userEmail;
+
+  try {
+    const user = await User.find({
+      email: useremail
+    })
+    if (!user) {
+      return res.status(402).json({ msg: "user not found" });
+    }
+
+    return res.status(200).json({ msg: "user found", user: user });
+
+  } catch (err) {
+
+  }
+})
 router.get("/testing", async (req, res) => {
   return res.status(200).json({ msg: "testing api url" });
 });
+
 
 module.exports = router;
