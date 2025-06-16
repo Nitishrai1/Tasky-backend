@@ -1,0 +1,120 @@
+# --- Frontend Deployment ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasky-frontend-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tasky-frontend
+  template:
+    metadata:
+      labels:
+        app: tasky-frontend
+    spec:
+      containers:
+        - name: tasky-frontend-container
+          image: nitishrai7070/tasky-frontend:latest
+          ports:
+            - containerPort: 5173
+          env:
+            - name: VITE_API_URL
+              value: https://tasky-backend-m72v.onrender.com
+            - name: MONGODB_URL
+              value: mongodb+srv://nitishraigkp007:z6InbXvBf7QluDgq@tasky-database.nq1km.mongodb.net/Tasky
+
+---
+
+# --- Frontend Service ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasky-frontend-service
+  namespace: default
+spec:
+  selector:
+    app: tasky-frontend
+  ports:
+    - protocol: TCP
+      port: 5173
+      targetPort: 5173
+  type: ClusterIP
+
+---
+
+# --- Backend Deployment ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasky-backend-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tasky-backend
+  template:
+    metadata:
+      labels:
+        app: tasky-backend
+    spec:
+      containers:
+        - name: tasky-backend-container
+          image: nitishrai7070/tasky-backend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URL
+              value: mongodb+srv://nitishraigkp007:z6InbXvBf7QluDgq@tasky-database.nq1km.mongodb.net/Tasky
+
+---
+
+# --- Backend Service ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasky-backend-service
+  namespace: default
+spec:
+  selector:
+    app: tasky-backend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: ClusterIP
+
+---
+
+# --- Ingress (In Default Namespace) ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-app-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /   # here we can difine the rules like rate limit and other anotations
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: tasky-domain.com
+      http:
+        paths:
+          - path: /client
+            pathType: Prefix
+            backend:
+              service:
+                name: tasky-frontend-service
+                
+                port:
+                  number: 5173
+          - path: /server
+            pathType: Prefix
+            backend:
+              service:
+                name: tasky-backend-service
+                
+                port:
+                  number: 3000
