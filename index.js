@@ -10,7 +10,8 @@ const Notification = require('./db');
 const testrouter = require('./routes/test');
 
 
-const cors = require('cors');  //cors is liye use hota hai taki jab bhi hamara backend or frontend alag alag locala host par chal raha hota hai to hamara browser allow nahi karta hai dusare local host wale frontend ko dusrare local host ke backend ho hit kare ki permision nahi deta hai cors help karta hai taki wo waysa kar sake with  the help off orogin se kar ke or agar hamko sabko allow karna haio tab empty rakh dena
+const cors = require('cors'); 
+const { requestCount, getMetrics, finalRequestCount, activeUserGauge } = require("./middlewire/monitoring/code");
 app.use(cors({}))
 
 const limit = ratelimit({
@@ -22,17 +23,27 @@ const limit = ratelimit({
 })
 
 
-
 app.use(limit)
 app.use(express.json());
+app.use(requestCount); //this middleware is to keep track the request for our monitoringapp
+app.use(activeUserGauge); 
+
+app.use(finalRequestCount);
+app.get('/metrics',getMetrics);  //this route will be hit by the prometheus only to get the metrics
+
+
+// Prometheus metrics route
+
+
 app.use("/", testrouter);
 
 app.use("/user", userroute);
-app.use("/user/Search", dataroute)
+app.use("/user/Search", dataroute);
+
 
 
 const PORT = 3000;
-const server = app.listen(PORT, function () {
+const server = app.listen(PORT,'0.0.0.0', function () {
 	console.log(`App is listing on port number ${PORT}`);
 })
 

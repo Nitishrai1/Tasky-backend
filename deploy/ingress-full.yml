@@ -19,6 +19,7 @@ spec:
           image: nitishrai7070/tasky-frontend:latest
           ports:
             - containerPort: 5173
+            
           env:
             - name: VITE_API_URL
               value: https://tasky-backend-m72v.onrender.com

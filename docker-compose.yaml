@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   mongodb:
     image: "mongo:latest"
@@ -6,9 +8,10 @@ services:
       - 27017:27017
     volumes:
       - mongodb_data:/data/db
+    restart: always 
 
   tasky_backend:
-    image: nitishrai7070/tasky-backend
+    build: ./ 
     container_name: backend_application
     depends_on:
       - mongodb
@@ -16,6 +19,35 @@ services:
       - 3000:3000
     environment:
       - MONGODB_URL=mongodb://mongo_db:27017/taskydb
+    restart: always
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus_server
+    ports:
+      - 9090:9090
+    volumes:
+      - ./deploy/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on:
+      - tasky_backend
+    restart: always
+    networks:
+      - monitoring
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3001:3000
+    networks:
+      - monitoring
+    environment:
+      - GF_SEURITY_ADMIN_PASSWORD=admin
 
 volumes:
   mongodb_data:
+
+networks:
+  monitoring:

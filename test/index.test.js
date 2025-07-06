@@ -42,6 +42,7 @@
 const request = require('supertest');
 const {app,server} = require('../index');  // Import your app
 
+
 describe('POST /sum', () => {
 
     afterAll(()=>{
@@ -59,10 +60,26 @@ describe('POST /sum', () => {
     it("should return the sum of the numbers", async () => {
         const res = await request(app).post("/sum").send({
             a: 1,
-            b: 2
+            b: 10
         });
 
-        expect(res.statusCode).toBe(411);  // Expect 200 status code
-        expect(res.body.answer).toBe("Invalid input");   // Expect the sum to be 3
+        expect(res.statusCode).toBe(200);  // Expect 200 status code
+        expect(res.body.answer).toBe(11);   // Expect the sum to be 3
     });
 });
+
+describe('POST /mul',()=>{
+    afterAll(()=>{
+        server.close();
+    })
+
+    it("should return the multiplication of the numbers",async()=>{
+        const res = await request(app).post("/mul").send({
+            a:2,
+            b:4
+        });
+        expect(res.statusCode).toBe(200);
+        expect(res.body.answer).toBe(8);
+    });
+});
+

@@ -2,7 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tasky-deployment
-  namespace: backend #this will create the deploy in the backend namespace pod
+  namespace: default
+  # namespace: backend #this will create the deploy in the backend namespace pod
 spec:
   replicas: 4
   selector:

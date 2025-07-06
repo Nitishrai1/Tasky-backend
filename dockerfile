@@ -12,4 +12,4 @@ EXPOSE 3000
 
 # ENV MONGODB_URL=mongodb://mongodb:27017/taskydb
 
-CMD ["node", "index.js"]
+CMD ["node", "index.js"] 
