@@ -23,7 +23,7 @@ const limit = ratelimit({
 })
 
 
-app.use(limit)
+// app.use(limit)
 app.use(express.json());
 app.use(requestCount); //this middleware is to keep track the request for our monitoringapp
 app.use(activeUserGauge); 
